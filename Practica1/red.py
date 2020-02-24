@@ -36,7 +36,7 @@ for dis in disabled:
     print(dis)
 
 for ip in enabled:
-    copy = 'sshpas -p alumno scp /home/randy/Documentos/Operativos/Practica1/backup.py '
+    copy = 'sshpass -p alumno scp /home/randy/Documentos/Operativos/Practica1/backup.py '
     target = 'alumno@'+ ip
     permission = 'chmod +x /home/alumno/backup.py'
     connect = 'sshpass -p alumno ssh ' + target
