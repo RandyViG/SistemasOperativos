@@ -1,5 +1,12 @@
+;**************************************************************
+;	   	   			      Contar hasta 10	
+;	      
+;Compilar:
+;	nasm -f elf lesson10.asm
+;	ld -m elf_i386 lesson10.o -o lesson10
+;**************************************************************
 
-%include	'functionsL7.asm'
+%include	'functions.asm'
 
 SECTION	.text
 global _start

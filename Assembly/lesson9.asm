@@ -1,5 +1,12 @@
+;**************************************************************
+;	   	   					User Input
+;	      
+;Compilar:
+;	nasm -f elf lesson9.asm
+;	ld -m elf_i386 lesson9.o -o lesson9
+;**************************************************************
 
-%include	'functionsL7.asm'
+%include	'functions.asm'
 
 SECTION	.data
 msg1	db	'Please enter yout name: ',	0x0

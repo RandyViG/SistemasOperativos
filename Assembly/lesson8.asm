@@ -1,5 +1,12 @@
+;**************************************************************
+;	   	   				Paso de argumentos
+;	      
+;Compilar:
+;	nasm -f elf lesson6.asm
+;	ld -m elf_i386 lesson6.o -o lesson6
+;**************************************************************
 
-%include	'functionsL7.asm'
+%include	'functions.asm'
 
 SECTION	.data
 global	_start

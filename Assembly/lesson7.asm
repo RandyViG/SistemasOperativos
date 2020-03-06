@@ -1,5 +1,12 @@
+;**************************************************************
+;	   	   			Saltos de line (Linefeeds)
+;	      
+;Compilar:
+;	nasm -f elf lesson7.asm
+;	ld -m elf_i386 lesson7.o -o lesson7
+;**************************************************************
 
-%include	'functionsL7.asm'
+%include	'functions.asm'
 
 SECTION	.data
 msg1	db	'Hello, brave new world!',	0x0
