@@ -7,32 +7,31 @@
 void arbol( int rama, int nivel );
 
 int main( int argc, char *argv[] ){
-
+    int nivel,pid1,i;
     if( argc < 2 ){
-	printf("Uso: %s niveles " ,argv[0]);
+		printf("Uso: %s niveles",argv[1]);
         exit(1);
     }
-	int nivel,pid,i;
     nivel = atoi( argv[1] );
-
     for(i=0; i<2; i++) { 
-        pid = fork();
-        if( pid == -1)
+        pid1 = fork();
+        if( pid1 == -1)
             perror("No se pudo crear el proceso...\n");
-        else if( pid == 0 )
-        {
+        else if( pid1 == 0 ){
             if( i == 0 ){
-				printf("Rama Derecha\n");
-                printf("Soy el hijo izquierdo mi id es %d y mi padres es %d\n", getpid(), getppid());
+				printf("RAMA IZQUIERDA\n");
+				printf("NIVEL %d \n",nivel);
+                printf("Hijo izquierdo mi id es %d y mi padres es %d\n", getpid(), getppid());
                 arbol(1, --nivel);
             }   
             if( i == 1 ){
-				printf("Rama Izquierda\n");
-                printf("Soy el hijo derecho mi id es %d y mi padres es %d\n", getpid(), getppid());
+				printf("\nRAMA DERECHA\n");
+				printf("NIVEL %d \n",nivel);
+                printf("Hijo derecho mi id es %d y mi padres es %d\n", getpid(), getppid());
                 arbol(2, --nivel);
             }
             else
-                exit(0);
+                exit(0);   
         }
         else 
             wait(0);
@@ -42,54 +41,54 @@ int main( int argc, char *argv[] ){
 
 
 void arbol( int rama, int nivel ){
-    printf("NIVEL %d \n",nivel+1);
-    int i,pid;
-	if(nivel == 0)
+    int i,pid1;
+	if(nivel <= 0)
 		return;
+	printf("NIVEL %d \n",nivel);
 	if( rama == 1){ //rama izquierda
-		for( i=0; i<2; i++ ){ 
-        	pid = fork();
-        	if( pid == -1)
+		for(i=0; i<2; i++) {	 
+        	pid1 = fork();
+        	if( pid1 == -1)
             	perror("No se pudo crear el proceso...\n");
-        	else if( pid == 0 ){
+        	else if( pid1 == 0 ){
             	if( i == 0 ){
-            		printf("Hijo izquierdo mi id es %d y mi padres es %d\n", getpid(), getppid());
-            		arbol( 1, --nivel );
+                	printf("Hijo izquierdo mi id es %d y mi padres es %d\n", getpid(), getppid());
+                	arbol(1, --nivel);
             	}   
-            	else if( i == 1 ){
+            	if( i == 1 ){
                 	printf("Hijo derecho mi id es %d y mi padres es %d\n", getpid(), getppid());
-                	arbol( 1, --nivel );
+                	arbol(1, --nivel);
             	}
             	else
-                	exit(0);
-        		}
-            else 
-            	wait(0);
-    	}
-	}	
-	if( rama == 2){ //rama derecha
-		for( i=0 ; i<3 ; i++ ){ 
-        	pid = fork();
-	       	if( pid == -1)
-           		perror("No se pudo crear el proceso...\n");
-        	else if( pid == 0 ){
-           		if( i == 0 ){
-            		printf("Hijo izquierdo mi id es %d y mi padres es %d\n", getpid(), getppid());
-            		arbol( 2, --nivel );
-           		}   
-				else if( i == 1 ){
-            		printf("Hijo central mi id es %d y mi padres es %d\n", getpid(), getppid());
-            		arbol( 2, --nivel );
-           		}
-           		else if( i == 2 ){
-            		printf("Hijo derecho mi id es %d y mi padres es %d\n", getpid(), getppid());
-            		arbol( 2, --nivel );
-           		}
-           		else
-            		exit(0);     
+                	exit(0);     
         	}
-           	else 
-      	    	wait(0);
+            else 
+                wait(0);
+    	}
+	}
+	if( rama == 2){ //rama derecha
+		for(i=0; i<3; i++){ 
+    	    pid1 = fork();
+    	    if( pid1 == -1)
+    	        perror("No se pudo crear el proceso...\n");
+    	    else if( pid1 == 0 ){
+    	        if( i == 0 ){
+    	            printf("Hijo izquierdo mi id es %d y mi padres es %d\n", getpid(), getppid());
+    	            arbol(2, --nivel);
+    	        }   
+    	        if( i == 1 ){
+    	            printf("Hijo central mi id es %d y mi padres es %d\n", getpid(), getppid());
+    	            arbol(2, --nivel);
+    	        }
+    	        if( i == 2 ){
+    	            printf("Hijo derecho mi id es %d y mi padres es %d\n", getpid(), getppid());
+    	            arbol(2, --nivel);
+    	        }
+    	        else
+    	            exit(0);
+    	    }
+    	    else 
+    	        wait(0);
     	}
 	}
 }
