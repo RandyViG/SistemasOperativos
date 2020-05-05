@@ -13,7 +13,7 @@
 int main ( void ){
   	int dsDad[2],dsSon[2];
   	int  bytesDad,bytesSon,pid;
-  	char message[100],send[100];;
+  	char message[100],send[100];
   	printf ("Ejemplo comunicación entre proceso padre e hijo.\n");
 
 	// Creando pipes
@@ -39,7 +39,7 @@ int main ( void ){
    		close( dsDad[READ] );
   	}
   	else{
-    		//Configirando PIPES
+    		//Configurando PIPES
     		close( dsDad[READ] ); //PIPE del papa al hijo
     		close( dsSon[WRITE] ); //PIPE del hijo al papa
 
