@@ -29,11 +29,11 @@ int main( int argc , char *argv[] ){
 	allocateMemory( matrixA , rows , columns );
 	allocateMemory( matrixB , columns , rows );
 	fillMatrix( matrixA , rows , columns );
-	fillMatrix( matrixB , rows , columns );
+	fillMatrix( matrixB , columns , rows );
 	printf("Matrix A:\n");
 	printMatrix( matrixA , rows , columns );
 	printf("Matrix B:\n");	
-	printMatrix( matrixB , rows , columns );
+	printMatrix( matrixB , columns , rows );
 
 	for( i=0 ; i < process ; i++ ){
 		pid = fork();
@@ -46,11 +46,10 @@ int main( int argc , char *argv[] ){
 				product(matrixA , matrixB , rows , columns , start , end);
 			exit(0);
 		}
-		else
-			wait(NULL);
 		start += range;
 		end += range;
 	}
+	wait(NULL);
 	return 0;
 }
 
@@ -81,6 +80,7 @@ void allocateMemory( int *matrix[] , int nrows , int ncolumns ){
 
 void product( int *matrixA[], int *matrixB[] , int nrows , int ncolumns , int start , int end ){
 	int i, j, k, p, n,  val, row[ncolumns];
+	printf("Proceso\n");
 	for( i = start ; i < end ; i++ ){
 		for( n = 0 , p = 0 ; n < ncolumns ; n++ , p++){
 			val = 0;
@@ -89,7 +89,7 @@ void product( int *matrixA[], int *matrixB[] , int nrows , int ncolumns , int st
 				row[p] = val; 
 			}
 		}
-		printf("Fila %d\n", i);
+		printf("Fila %d:  ", i);
 		for( k = 0 ; k < ncolumns ; k++)
 			printf("%d " , row[k]);
 		printf("\n");	
