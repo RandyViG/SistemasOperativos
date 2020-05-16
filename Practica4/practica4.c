@@ -30,11 +30,11 @@ int main( int argc , char *argv[] ){
 	allocateMemory( matrixB , columns , rows );
 	fillMatrix( matrixA , rows , columns );
 	fillMatrix( matrixB , columns , rows );
-	printf("Matrix A:\n");
+	printf("Matriz A:\n");
 	printMatrix( matrixA , rows , columns );
-	printf("Matrix B:\n");	
+	printf("Matriz B:\n");	
 	printMatrix( matrixB , columns , rows );
-
+	printf("\nResultado:\n");
 	for( i=0 ; i < process ; i++ ){
 		pid = fork();
 		if( pid == -1 )
@@ -66,7 +66,7 @@ void printMatrix( int *matrix[] , int nrows , int ncolumns ){
 	int i,j,num;
 	for( i=0 ; i < nrows ; i++ ){
 		for( j=0 ; j < ncolumns ; j++ )
-			printf("%d ",matrix[i][j]);
+			printf("%*d ",4,matrix[i][j]);
 		printf("\n");
 	}
 	printf("\n");
@@ -79,19 +79,17 @@ void allocateMemory( int *matrix[] , int nrows , int ncolumns ){
 }
 
 void product( int *matrixA[], int *matrixB[] , int nrows , int ncolumns , int start , int end ){
-	int i, j, k, p, n,  val, row[ncolumns];
-	printf("Proceso\n");
+	int i, j, k, p, n, val, row[ncolumns];
 	for( i = start ; i < end ; i++ ){
 		for( n = 0 , p = 0 ; n < ncolumns ; n++ , p++){
 			val = 0;
-			for( j = 0 , k = 0; j < ncolumns ; j++ , k++ ){
-				val += matrixA[i][j] * matrixB[n][i];
-				row[p] = val; 
-			}
+			for( j = 0 ; j < ncolumns ; j++ )
+				val += matrixA[i][j] * matrixB[j][n]; 
+			row[p] = val;
 		}
-		printf("Fila %d:  ", i);
+		printf("Fila %d: ", i);
 		for( k = 0 ; k < ncolumns ; k++)
-			printf("%d " , row[k]);
+			printf("%*d " , 5,row[k]);
 		printf("\n");	
 	}
 }
