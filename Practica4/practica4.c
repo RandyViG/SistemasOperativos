@@ -8,7 +8,7 @@
 void fillMatrix(int *matrix[],int nrows,int ncolumns);
 void printMatrix(int *matrix[],int nrows,int ncolumns);
 void allocateMemory(int *matrix[],int ncolumns ,int nrows);
-void product(int *matrixA[],int *matrixB[],int nrows,int ncolumns,int start,int end);
+void product(int *matrixA[],int *matrixB[],int ncolumns,int start,int end);
 
 int main( int argc , char *argv[] ){
 	if( argc < 4 || atoi(argv[1]) < atoi(argv[3]) ){
@@ -41,9 +41,9 @@ int main( int argc , char *argv[] ){
 			printf("Error al crear el proceso %d",i);
 		else if( pid == 0 ){
 			if( i == (process -1) )
-				product(matrixA , matrixB , rows , columns , start , end+extra);
+				product(matrixA , matrixB , rows , start , end+extra);
 			else
-				product(matrixA , matrixB , rows , columns , start , end);
+				product(matrixA , matrixB , rows , start , end);
 			exit(0);
 		}
 		start += range;
@@ -78,7 +78,7 @@ void allocateMemory( int *matrix[] , int nrows , int ncolumns ){
 		matrix[i] = (int *) malloc( sizeof(int) * ncolumns );
 }
 
-void product( int *matrixA[], int *matrixB[] , int nrows , int ncolumns , int start , int end ){
+void product( int *matrixA[], int *matrixB[] , int ncolumns , int start , int end ){
 	int i, j, k, p, n, val, row[ncolumns];
 	for( i = start ; i < end ; i++ ){
 		for( n = 0 , p = 0 ; n < ncolumns ; n++ , p++){
@@ -87,7 +87,7 @@ void product( int *matrixA[], int *matrixB[] , int nrows , int ncolumns , int st
 				val += matrixA[i][j] * matrixB[j][n]; 
 			row[p] = val;
 		}
-		printf("Fila %d: ", i);
+		printf("Fila %*d: ", 3,i);
 		for( k = 0 ; k < ncolumns ; k++)
 			printf("%*d " , 5,row[k]);
 		printf("\n");	
