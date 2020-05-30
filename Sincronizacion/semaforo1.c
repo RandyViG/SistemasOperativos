@@ -1,4 +1,8 @@
-// Compilar: gcc semaforo1.c -lpthread -lrt 
+/*
+Problema del productor-consumidor entre procesos
+Implementando semáforos (POSIX) con nombre
+Compilar: gcc semaforo1.c -lpthread -lrt */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>

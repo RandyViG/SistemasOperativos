@@ -19,8 +19,12 @@ int DestruyeMemoriaCompartida( int id_Memoria , char *buffer );
 int main(){
     int pid,id;
     char i,j;
-    sem_t mutex;
-    if( sem_init( &mutex , 1 , 1 ) == -1 ){
+    sem_t consumidor,productor;
+    if( sem_init( &productor , 1 , 1 ) == -1 ){
+        printf("Error al crear el semaforo\n");
+        exit(1);
+    }
+    if( sem_init( &consumidor , 1 , 0 ) == -1 ){
         printf("Error al crear el semaforo\n");
         exit(1);
     }
@@ -30,26 +34,29 @@ int main(){
     else if( pid == 0 ){
         id = CrearLigamemoria();
         for( j = 0 ; j < 10 ; j++ ){
-            sem_wait( &mutex );
+            sem_wait( &productor );
             *Memoria = j;
             printf("Produjo: %d\n",j);
-            sem_post( &mutex );
+            sem_post( &consumidor );
         }
-        sem_close( &mutex );
+        sem_close( &productor );
+        sem_close( &consumidor );
         DestruyeMemoriaCompartida( id , Memoria );
         exit(0);
     }
     else{
         id = CrearLigamemoria();
         for( j = 0 ; j < 10 ; j++ ){
-            sem_wait( &mutex );
+            sem_wait( &consumidor );
             printf("Consumio: %d\n",*Memoria);
-            sem_post( &mutex );
+            sem_post( &productor );
         }
-        sem_close( &mutex );
+        sem_close( &productor );
+        sem_close( &consumidor );
         DestruyeMemoriaCompartida( id , Memoria );
     }
-    sem_destroy( &mutex );
+    sem_destroy( &productor );
+    sem_destroy( &consumidor );
     wait(NULL);
     return 0;
 }
