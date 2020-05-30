@@ -24,7 +24,6 @@ int main(){
         printf("Error al crear el semaforo\n");
         exit(1);
     }
-    //id = CrearLigamemoria();
     pid = fork();
     if( pid == -1 )
         printf("Error al crear el hijo\n");
@@ -35,7 +34,6 @@ int main(){
             *Memoria = j;
             printf("Produjo: %d\n",j);
             sem_post( &mutex );
-            //sleep( 1 );
         }
         sem_close( &mutex );
         DestruyeMemoriaCompartida( id , Memoria );
@@ -47,7 +45,6 @@ int main(){
             sem_wait( &mutex );
             printf("Consumio: %d\n",*Memoria);
             sem_post( &mutex );
-            //sleep( 1 );
         }
         sem_close( &mutex );
         DestruyeMemoriaCompartida( id , Memoria );

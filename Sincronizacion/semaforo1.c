@@ -56,7 +56,9 @@ int main(){
     }
     wait(NULL);
     sem_close( semaforoProductor );
+    sem_destroy( semaforoProductor );
     sem_close( semaforoConsumidor );
+    sem_destroy( semaforoConsumidor );
     return 0;
 }
 
