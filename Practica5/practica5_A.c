@@ -12,7 +12,7 @@
 void fillMatrix(int *matrix[],int nrows,int ncolumns);
 void printMatrix(int *matrix[],int nrows,int ncolumns);
 void allocateMemory(int *matrix[],int ncolumns ,int nrows);
-void product(int *matrixA[],int *matrixB[],int *row[],int ncolumns,int start,int end);
+void product(int *matrixA[],int *matrixB[],int *result[],int ncolumns,int start,int end);
 
 int main( int argc , char *argv[] ){
 	if( argc < 4 || atoi(argv[1]) < atoi(argv[3]) ){
@@ -55,31 +55,31 @@ int main( int argc , char *argv[] ){
 		if( pid == -1 )
 			printf("Error al crear el proceso %d\n",i);
 		else if( pid == 0 ){
-            close( ds[i][READ] ); // Child to Dad
-			close( ds2[i][WRITE] ); // Dad to child
+            close( ds[i][READ] );    /* Child to Dad */
+			close( ds2[i][WRITE] );  /* Dad to child */
 			if( i == (process -1) ){
-                int *rowResult[ range + extra ];
-                allocateMemory( rowResult, range + extra , rows );
-                product(matrixA , matrixB , rowResult , rows , start , end+extra);
+                int *result[ range + extra ];
+                allocateMemory( result, range + extra , rows );
+                product(matrixA , matrixB , result , rows , start , end+extra);
 				Ipos = start;
 				Fpos = end+extra;
 				read( ds2[i][READ] , &j , sizeof(j) );
 				write( ds[i][WRITE] , &Ipos , sizeof(Ipos) );
 				write( ds[i][WRITE] , &Fpos , sizeof(Fpos) );
 				for ( j = 0 ; j < range + extra ; j++)
-					write( ds[i][WRITE] , rowResult[j] , rows * sizeof(int) );
+					write( ds[i][WRITE] , result[j] , rows * sizeof(int) );
             }
 			else{
-                int *rowResult[ range ];
-                allocateMemory(rowResult, range , rows );
-                product(matrixA , matrixB , rowResult , rows , start , end);
+                int *result[ range ];
+                allocateMemory(result, range , rows );
+                product(matrixA , matrixB , result , rows , start , end);
 				Ipos = start;
 				Fpos = end;
 				read( ds2[i][READ] , &j , sizeof(j) );
 				write( ds[i][WRITE] , &Ipos , sizeof(Ipos) );
 				write( ds[i][WRITE] , &Fpos , sizeof(Fpos) );
 				for ( j = 0 ; j < range ; j++)
-					write( ds[i][WRITE] , rowResult[j] , rows * sizeof(int) );
+					write( ds[i][WRITE] , result[j] , rows * sizeof(int) );
             }
 			close( ds2[i][READ] );
             close( ds[i][WRITE] );
@@ -138,14 +138,14 @@ void allocateMemory( int *matrix[] , int nrows , int ncolumns ){
 		matrix[i] = (int *) malloc( sizeof(int) * ncolumns );
 }
 
-void product( int *matrixA[], int *matrixB[] , int *row[] , int ncolumns , int start , int end ){
+void product( int *matrixA[], int *matrixB[] , int *result[] , int ncolumns , int start , int end ){
 	int i, j, k, p , n, val;
 	for( i = start , k = 0 ; i < end ; i++ , k++ ){
 		for( n = 0 ; n < ncolumns ; n++ ){
 			val = 0;
 			for( j = 0 ; j < ncolumns ; j++ )
 				val += matrixA[i][j] * matrixB[j][n]; 
-			row[k][n] = val;
+			result[k][n] = val;
 		}
 	}
 }
