@@ -23,7 +23,8 @@ int DestruyeMemoriaCompartida( int id_Memoria , int *buffer );
 sem_t * CrearSemaforo(  char *name , int val );
 
 int main(){
-    int pid,id,j,i;
+    pid_t pid;
+    int id, j, i, inicio=0, fin=100;
     char *name1 = "consumidor";
     char *name2 = "productor";
     sem_t *semaforoConsumidor , *semaforoProductor;
@@ -39,31 +40,18 @@ int main(){
             printf("Error al crear el hijo\n");
         else if( pid == 0 ){
             id = CrearLigamemoria();
-            if( i == 0 ){
-                for( j = 0 ; j < 100 ; j++ ){
-                    sem_wait( semaforoProductor );
-                    *Memoria = j;
-                    printf("Productor 1: %d\n",j);
-                    sem_post( semaforoConsumidor );
-                }
-                sem_unlink( name1 );
-                sem_unlink( name2 );
-                exit(0);
+            for( j = inicio ; j < fin ; j++ ){
+                sem_wait( semaforoProductor );
+                *Memoria = j;
+                printf("Productor %d: %d\n", i+1 , j );
+                sem_post( semaforoConsumidor );
             }
-            else if( i == 1 ){
-                for( j = 200 ; j < 300 ; j++ ){
-                    sem_wait( semaforoProductor );
-                    *Memoria = j;
-                    printf("Productor 2: %d\n",j);
-                    sem_post( semaforoConsumidor );
-                }
-                sem_unlink( name1 );
-                sem_unlink( name2 );
-                exit(0);
-            }
-            else
-                exit(0);            
+            sem_unlink( name1 );
+            sem_unlink( name2 );
+            exit(0);       
         }
+        inicio += 100;
+        fin += 100;
     }
 
     id = CrearLigamemoria();
