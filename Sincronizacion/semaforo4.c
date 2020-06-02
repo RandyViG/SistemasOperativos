@@ -134,7 +134,6 @@ int CrearLigamemoria( void ){
     }
     else
         printf("Creo la memoria con id: %d\n",shmid);
-
     //Se liga a la zona de memoria compartida
     if( ( Memoria = (int*)shmat( shmid , (int*) 0 , 0 ) ) == (void*)-1 ){
         perror("shmat \n");
@@ -166,7 +165,7 @@ sem_t * CrearSemaforo( char *name , int val){
             printf("Ligado al semaforo correctamente %p\n", mut);
     }
     else{
-        printf("Semaforo creado: %p\n",mut);
+        printf("Semaforo: %s creado: %p\n", name,mut );
         sem_init( mut , 1 , val );
     }
 
