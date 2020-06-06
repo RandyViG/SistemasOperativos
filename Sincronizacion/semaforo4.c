@@ -15,7 +15,10 @@ Compilar: gcc semaforo4.c -lpthread -lrt */
 #include <sys/shm.h>
 #include <sys/ipc.h>
 
-#define TAM_MEM 2
+#define TAM_MEM 3
+#define RANGO 100
+#define No_PRODUCTORES 3
+#define No_CONSUMIODRES 2
 int *Memoria;
 
 int CrearLigamemoria( void );
@@ -24,16 +27,17 @@ sem_t * CrearSemaforo(  char *name , int val );
 
 int main(){
     pid_t pid;
-    int id, j, i,status, inicio = 0, fin = 10, zona1, zona2;
+    int id, j, i,status, inicio = 0, fin = RANGO, zona1, zona2, ultimo = 0;
     char *name1 = "consumidor_zona1", *name2 = "productor_zona1";
     char *name3 = "consumidor_zona2", *name4 = "productor_zona2";
-    sem_t *consumidor_zona1 , *productor_zona1, *consumidor_zona2 , *productor_zona2;
+    sem_t *consumidor_zona1 , *productor_zona1, *consumidor_zona2 , *productor_zona2, *consumidos;
 
     consumidor_zona1 = CrearSemaforo( name1 , 0 );
     productor_zona1 = CrearSemaforo( name2 , 1 );
     consumidor_zona2 = CrearSemaforo( name3 , 0 );
     productor_zona2 = CrearSemaforo( name4 , 1 );
     id = CrearLigamemoria();
+    Memoria[2] = 0;
     
     for( i = 0 ; i < 3 ; i++ ){
         pid = fork();
@@ -62,13 +66,18 @@ int main(){
                 }
             }
             sem_unlink( name1 );
+            sem_close( productor_zona1 );
             sem_unlink( name2 );
+            sem_close( consumidor_zona1 );
             sem_unlink( name3 );
+            sem_close( productor_zona2 );
             sem_unlink( name4 );
+            sem_close( consumidor_zona2 );
+
             exit(0);
         }
-        inicio += 10;
-        fin += 10;
+        inicio += RANGO;
+        fin += RANGO;
     }
 
     for( i = 0 ; i < 2 ; i++ ){
@@ -76,7 +85,18 @@ int main(){
         if ( pid == -1 )
             perror( "Error al crear el proceso hijo: " );
         else if( pid == 0 ){
-            for( j = 0 ; j < 15 ; j++ ){
+            for( ; ; ){
+                sem_wait( consumidos );
+                if( Memoria[2] < RANGO * No_PRODUCTORES ){
+                    if( Memoria[2] == ( RANGO * No_PRODUCTORES - 1 ) )
+                        ultimo = 1;
+                    Memoria[2]++;
+                    sem_post( consumidos );
+                }
+                else{
+                    sem_post( consumidos );
+                    break;
+                }
                 while( 1 ){
                     sem_getvalue(consumidor_zona1,&zona1);
                     if( zona1 == 1 ){ 
@@ -94,26 +114,27 @@ int main(){
                     }
                 }
             }
+
             sem_unlink( name1 );
+            sem_close( productor_zona1 );
             sem_unlink( name2 );
+            sem_close( consumidor_zona1 );
             sem_unlink( name3 );
+            sem_close( productor_zona2 );
             sem_unlink( name4 );
+            sem_close( consumidor_zona2 );
+            
+            if( ultimo ){
+                DestruyeMemoriaCompartida( id , Memoria );
+                sem_destroy( productor_zona1 );
+                sem_destroy( consumidor_zona1 );
+                sem_destroy( productor_zona2 );
+                sem_destroy( consumidor_zona2 );
+            }
+
             exit(0);
         }
     }
-
-    wait(&status);
-    DestruyeMemoriaCompartida( id , Memoria );
-
-    sem_close( productor_zona1 );
-    sem_destroy( productor_zona1 );
-    sem_close( consumidor_zona1 );
-    sem_destroy( consumidor_zona1 );
-
-    sem_close( productor_zona2 );
-    sem_destroy( productor_zona2 );
-    sem_close( consumidor_zona2 );
-    sem_destroy( consumidor_zona2 );
 
     return 0;
 }
