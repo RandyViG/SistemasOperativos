@@ -1,6 +1,6 @@
 /*
 Problema del productor-consumidor entre procesos
-con espera pasiva.
+con espera no activa.
 Implementando semáforos (POSIX) con nombre
 Compilar: gcc semaforo3.c -lpthread -lrt */
 

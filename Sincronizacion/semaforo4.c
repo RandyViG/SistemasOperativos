@@ -30,12 +30,14 @@ int main(){
     int id, j, i,status, inicio = 0, fin = RANGO, zona1, zona2, ultimo = 0;
     char *name1 = "consumidor_zona1", *name2 = "productor_zona1";
     char *name3 = "consumidor_zona2", *name4 = "productor_zona2";
+    char *name5 = "consumidos";
     sem_t *consumidor_zona1 , *productor_zona1, *consumidor_zona2 , *productor_zona2, *consumidos;
 
     consumidor_zona1 = CrearSemaforo( name1 , 0 );
     productor_zona1 = CrearSemaforo( name2 , 1 );
     consumidor_zona2 = CrearSemaforo( name3 , 0 );
     productor_zona2 = CrearSemaforo( name4 , 1 );
+    consumidos = CrearSemaforo( name5 , 1 );
     id = CrearLigamemoria();
     Memoria[2] = 0;
     
