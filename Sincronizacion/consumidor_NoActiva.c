@@ -2,7 +2,7 @@
 Problema del productor-consumidor entre procesos.
 Consumidor con espera no activa.
 Implementando semáforos (POSIX) con nombre
-Compilar: gcc semaforo3.c -lpthread -lrt */
+Compilar: gcc consumidor_NoActiva.c -lpthread -lrt */
 
 #include <stdio.h>
 #include <stdlib.h>

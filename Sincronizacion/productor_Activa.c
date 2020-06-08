@@ -23,9 +23,14 @@ int CrearLigaMemoria( void );
 int DestruyeMemoriaCompartida( int id_Memoria , int *buffer );
 sem_t * CrearSemaforo(  char *name , int val );
 
-int main(){
+int main( int argc , char *argv[] ){
+    if( argc < 2 ){
+        printf("Uso: %s Valor_Inicial_Produccion\n", argv[0]);
+        exit(1);
+    }
+    
     pid_t pid;
-    int id, j, zona1, zona2, ultimo = 0;
+    int id, j, zona1, zona2, produccion = atoi( argv[1] );
     char *name1 = "consumidor_zona1", *name2 = "productor_zona1";
     char *name3 = "consumidor_zona2", *name4 = "productor_zona2";
     char *name5 = "consumidos";
@@ -42,16 +47,16 @@ int main(){
             sem_getvalue( productor_zona1 , &zona1 );
             if( zona1 == 1 ){
                 sem_wait( productor_zona1 );
-                Memoria[0] = j;
-                printf("Productor en la zona 1: %d\n", j );
+                Memoria[0] = produccion;
+                printf("Productor en la zona 1: %d\n", produccion++ );
                 sem_post( consumidor_zona1 );
                 break;
             }
             sem_getvalue( productor_zona2 , &zona2 );
             if( zona2 == 1 ){
                 sem_wait( productor_zona2 );
-                Memoria[1] = j;
-                printf("Productor en la zona 2: %d\n", j );
+                Memoria[1] = produccion;
+                printf("Productor en la zona 2: %d\n", produccion++ );
                 sem_post( consumidor_zona2 );
                 break;
             }
