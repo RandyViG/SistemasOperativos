@@ -1,7 +1,8 @@
 /*
 Problema del productor-consumidor entre procesos.
+Consumidor con espera no activa.
 Implementando semáforos (POSIX) con nombre
-Compilar: gcc productor.c -lpthread -lrt */
+Compilar: gcc semaforo3.c -lpthread -lrt */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,13 +19,17 @@ Compilar: gcc productor.c -lpthread -lrt */
 #define RANGO 100000
 int *Memoria;
 
-int CrearLigaMemoria( void );
+int CrearLigamemoria( void );
 int DestruyeMemoriaCompartida( int id_Memoria , int *buffer );
 sem_t * CrearSemaforo(  char *name , int val );
 
-int main(){
+int main( int argc , char *argv[] ){
+    if( argc < 2 ){
+        printf( "Uso: %s No_productores\n",argv[0] );
+        exit(1);
+    }
     pid_t pid;
-    int id, j, zona1, zona2, ultimo = 0;
+    int id, ultimo = 0, Nproductores = atoi( argv[1] );
     char *name1 = "consumidor_zona1", *name2 = "productor_zona1";
     char *name3 = "consumidor_zona2", *name4 = "productor_zona2";
     char *name5 = "consumidos";
@@ -35,29 +40,33 @@ int main(){
     consumidor_zona2 = CrearSemaforo( name3 , 0 );
     productor_zona2 = CrearSemaforo( name4 , 1 );
     consumidos = CrearSemaforo( name5 , 1 );
-    id = CrearLigaMemoria();
-    
-    for( j = 0 ; j < RANGO ; j++ ){
-        while ( 1 ){
-            sem_getvalue( productor_zona1 , &zona1 );
-            if( zona1 == 1 ){
-                sem_wait( productor_zona1 );
-                Memoria[0] = j;
-                printf("Productor en la zona 1: %d\n", j );
-                sem_post( consumidor_zona1 );
+    id = CrearLigamemoria();
+
+    for( ;  ; ){
+        sem_wait( consumidos );
+        if( Memoria[2] < RANGO * Nproductores ){
+            if( Memoria[2] == ( RANGO * Nproductores - 1 ) )
+                ultimo = 1;
+            Memoria[2]++;
+        }
+        else{
+            sem_post( consumidos );
+            break;
+        }
+        while( 1 ){
+            if( sem_wait( consumidor_zona1 ) == 0 ){
+                printf("Consumidor de zona 1: %d\n", Memoria[0] );
+                sem_post( productor_zona1 );
                 break;
             }
-            sem_getvalue( productor_zona2 , &zona2 );
-            if( zona2 == 1 ){
-                sem_wait( productor_zona2 );
-                Memoria[1] = j;
-                printf("Productor en la zona 2: %d\n", j );
-                sem_post( consumidor_zona2 );
+            else if( sem_wait( consumidor_zona2 ) == 0 ){
+                printf("Consumidor de zona 2: %d\n", Memoria[1] );
+                sem_post( productor_zona2 );
                 break;
             }
         }
+        sem_post( consumidos );
     }
-
     sem_unlink( name1 );
     sem_close( productor_zona1 );
     sem_unlink( name2 );
@@ -66,12 +75,23 @@ int main(){
     sem_close( productor_zona2 );
     sem_unlink( name4 );
     sem_close( consumidor_zona2 );
-
+    sem_unlink( name5 );
+    sem_close( consumidos );
+    
+    if( ultimo ){
+        DestruyeMemoriaCompartida( id , Memoria );
+        sem_destroy( productor_zona1 );
+        sem_destroy( consumidor_zona1 );
+        sem_destroy( productor_zona2 );
+        sem_destroy( consumidor_zona2 );
+        sem_destroy( consumidos );
+    }
+    
     return 0;
 }
 
-int CrearLigaMemoria( void ){
-    int key2,shmid,crear=0;
+int CrearLigamemoria( void ){
+    int key2,shmid;
     key2 = ftok("/bin/ls",3);
 
     //Verifica si existe la zona de memoria
@@ -84,17 +104,13 @@ int CrearLigaMemoria( void ){
         else
             printf("Se ligo a la memoria con id: %d\n",shmid);
     }
-    else{
+    else
         printf("Creo la memoria con id: %d\n",shmid);
-        crear = 1;
-    }
     //Se liga a la zona de memoria compartida
     if( ( Memoria = (int*)shmat( shmid , (int*) 0 , 0 ) ) == (void*)-1 ){
         perror("shmat \n");
         exit(1);
     }
-    if( crear )
-        Memoria[2] = 0;
 
     return shmid; //Descriptor de la memoria
 }
@@ -121,7 +137,7 @@ sem_t * CrearSemaforo( char *name , int val){
             printf("Ligado al semaforo correctamente %p\n", mut);
     }
     else{
-        printf("Semaforo: %s creado: %p\n", name,mut );
+        printf("Semaforo: %s creado: %p\n", name,mut);
         sem_init( mut , 1 , val );
     }
 
